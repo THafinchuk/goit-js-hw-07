@@ -14,8 +14,8 @@ galleryItems.forEach(e => {
       />
     </a>
   </li>` 
-  
 })
+
 galleryEl.addEventListener('click',showImg)
 
    const imgShow =  basicLightbox.create(`
@@ -29,12 +29,14 @@ galleryEl.addEventListener('click',showImg)
     },
   }
   )
+
 function showImg(e){
   e.preventDefault()
   imgShow.element().querySelector('img').src = e.target.dataset.source
   imgShow.show()
-
+  if(e.target.nodeName !== 'img'){return}
 }
+
 function closeImg(e){
   if(e.code === 'Escape'){
     imgShow.close()
