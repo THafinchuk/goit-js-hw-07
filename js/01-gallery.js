@@ -1,46 +1,51 @@
 import { galleryItems } from './gallery-items.js';
 // Change code below this line
 
-console.log(galleryItems);
-const galleryEl = document.querySelector('.gallery')
-galleryItems.forEach(e => {
-    galleryEl.innerHTML += `<li class="gallery__item">
-    <a class="gallery__link" href="large-image.jpg">
-      <img
-        class="gallery__image"
-        src="${e.preview}"
-        data-source="${e.original}"
-        alt="${e.description}"
-      />
-    </a>
-  </li>` 
-})
+const galleryItemsMarkup = galleryItems.map(
+  ({ preview, original, description }) =>
+    `<li class="gallery__item">
+       <a class="gallery__link" href="${original}">
+         <img
+           class="gallery__image"
+           src="${preview}"
+           data-source="${original}"
+           alt="${description}"
+         />
+       </a>
+     </li>`
+).join("");
+const galleryList = document.querySelector('.gallery');
+galleryList.insertAdjacentHTML("beforeend", galleryItemsMarkup);
 
-galleryEl.addEventListener('click',showImg)
+galleryList.addEventListener('click', (event) => {
+  event.preventDefault();
 
-   const imgShow =  basicLightbox.create(`
-		<img>
-	`,{
-    onShow: (imgShow) => { 
-      window.addEventListener('keydown', closeImg)
-    },
-    onClose: (imgShow) => {
-      window.removeEventListener('keydown',closeImg)
-    },
+  if (event.target.nodeName === 'IMG') {
+    const largeSourse = event.target.dataset.source;
+
+    const instance = basicLightbox.create(`
+      <img src="${largeSourse}" width="800" height="600">
+    `, {
+      onShow: (instance) => {
+        const closeEscape = (event) => {
+          if (event.key === 'Escape') {
+            instance.close();
+          }
+        };
+
+window.addEventListener('keydown', closeEscape);
+
+instance.element().addEventListener('click', (event) => {
+  if (event.target.nodeName !== 'IMG') {
+      instance.close();
+     }
+  });
+        
+onClose: (instance) => {
+  window.removeEventListener('keydown', closeEscape);
+    };
   }
-  )
-
-function showImg(e){
-  e.preventDefault()
-  imgShow.element().querySelector('img').src = e.target.dataset.source
-  imgShow.show()
-  if(e.target.nodeName !== 'img'){return}
-}
-
-function closeImg(e){
-  if(e.code === 'Escape'){
-    imgShow.close()
-}
-}
-
-console.log(galleryItems);
+  });
+    instance.show();
+  }
+});
